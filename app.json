@@ -9,6 +9,16 @@
       "expo-router"
     ],
     "scheme": "fabricaflow",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0b0c10"
+    },
+    "android": {
+      "package": "com.fabricaflow.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0b0c10"
+      }
+    },
     "web": {
       "bundler": "metro"
     }
