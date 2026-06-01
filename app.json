@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "FabricaFlow",
+    "slug": "sofa-chair-factory-manager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "plugins": [
+      "expo-router"
+    ],
+    "scheme": "fabricaflow",
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
