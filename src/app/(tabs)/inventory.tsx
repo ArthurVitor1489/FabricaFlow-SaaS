@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import * as Lucide from 'lucide-react-native';
 
 export default function InventoryScreen() {
-  const { inventory, adjustInventoryItem, addInventoryItem } = useApp();
+  const { inventory, adjustInventoryItem, addInventoryItem, setInventoryQuantity } = useApp();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<'all' | 'wood' | 'fabric' | 'foam' | 'hardware'>('all');
   
@@ -139,9 +139,16 @@ export default function InventoryScreen() {
                     <Lucide.Minus size={12} className="text-white" />
                   </TouchableOpacity>
 
-                  <Text className="text-white font-black text-xs text-center flex-1">
-                    {item.quantity}
-                  </Text>
+                  <TextInput
+                    keyboardType="numeric"
+                    value={item.quantity === 0 ? '' : item.quantity.toString()}
+                    onChangeText={(val) => {
+                      const newQty = parseFloat(val) || 0;
+                      setInventoryQuantity(item.id, newQty);
+                    }}
+                    className="text-white font-black text-xs text-center flex-1 p-0 m-0"
+                    style={{ outlineStyle: 'none' } as any}
+                  />
 
                   <TouchableOpacity
                     onPress={() => adjustInventoryItem(item.id, 1)}

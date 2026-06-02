@@ -33,6 +33,7 @@ interface AppContextType {
   advanceOrder: (orderId: string) => void;
   adjustInventoryItem: (itemId: string, amount: number) => void;
   addInventoryItem: (item: Omit<InventoryItem, 'id' | 'status'>) => void;
+  setInventoryQuantity: (itemId: string, quantity: number) => void;
   addCustomer: (customer: Omit<Customer, 'id'>) => void;
   signDelivery: (deliveryId: string, signatureBase64: string) => void;
   simulateTimeAdvance: () => void;
@@ -260,6 +261,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  // Definir quantidade de estoque diretamente
+  const setInventoryQuantity = (itemId: string, quantity: number) => {
+    setInventory(prevInv => {
+      return prevInv.map(item => {
+        if (item.id !== itemId) return item;
+        const newQty = Math.max(0, quantity);
+        return {
+          ...item,
+          quantity: newQty,
+          status: newQty <= item.minQuantity ? 'critical' : 'normal'
+        };
+      });
+    });
+
+    // Opcional: Atualizar no Supabase Cloud
+    if (isSupabaseConfigured && supabase) {
+      const updatedItem = inventory.find(i => i.id === itemId);
+      if (updatedItem) {
+        supabase.from('inventory')
+          .update({ quantity, status: quantity <= updatedItem.minQuantity ? 'critical' : 'normal' })
+          .eq('id', itemId)
+          .then(({ error }) => {
+            if (error) console.error('Erro ao atualizar quantidade no Supabase:', error);
+          });
+      }
+    }
+  };
+
   // Adicionar Cliente CRM
   const addCustomer = (customerData: Omit<Customer, 'id'>) => {
     const newCustomer: Customer = {
@@ -324,6 +353,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         advanceOrder,
         adjustInventoryItem,
         addInventoryItem,
+        setInventoryQuantity,
         addCustomer,
         signDelivery,
         simulateTimeAdvance

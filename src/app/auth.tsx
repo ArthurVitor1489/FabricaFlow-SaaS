@@ -41,7 +41,7 @@ export default function AuthScreen() {
         <View className="flex-1 justify-center px-6 py-12">
           
           {/* Logo e Branding */}
-          <View className="items-center mb-10">
+          <View className="items-center mb-10 w-full max-w-[440px] self-center">
             <View className="bg-brand-500 p-4 rounded-3xl mb-4 border border-brand-400/30" style={{ elevation: 5 }}>
               <Lucide.Factory size={36} fill="white" className="text-white" />
             </View>
@@ -54,7 +54,7 @@ export default function AuthScreen() {
           </View>
 
           {/* Painel de Login (Glassmorphism Mock) */}
-          <View className="bg-monday-darkGridBorder/20 border border-monday-darkGridBorder/65 p-6 rounded-3xl mb-6">
+          <View className="bg-monday-darkGridBorder/20 border border-monday-darkGridBorder/65 p-6 rounded-3xl mb-6 w-full max-w-[440px] self-center">
             <Text className="text-white text-lg font-bold mb-5">Conectar à Fábrica</Text>
             
             {/* Campo Email */}
@@ -151,7 +151,7 @@ export default function AuthScreen() {
           </View>
 
           {/* Dica do sistema */}
-          <View className="flex-row items-center justify-center space-x-2">
+          <View className="flex-row items-center justify-center space-x-2 w-full max-w-[440px] self-center">
             <Lucide.ShieldCheck size={14} className="text-emerald-400" />
             <Text className="text-gray-500 text-xs text-center ml-1">
               Conexão Supabase SSL Habilitada
