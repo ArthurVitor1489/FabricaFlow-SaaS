@@ -41,6 +41,15 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Helper para gerar UUIDs v4 de forma robusta e compatível
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);
   const [role, setRoleState] = useState<UserRole>('gerente');
@@ -126,7 +135,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Criar Pedido
   const createOrder = (newOrderData: Omit<Order, 'id' | 'createdAt' | 'stage' | 'stageEntryTime' | 'simulatedDeliveryDate'>) => {
-    const newId = `p${orders.length + 1}`;
+    const newId = `p-${generateUUID()}`;
     const now = new Date().toISOString();
     
     const newOrder: Order = {
@@ -181,7 +190,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         // --- GERAÇÃO AUTOMÁTICA DE ENTREGA ---
         if (nextStage === 'ready') {
-          const newDeliveryId = `d${deliveries.length + 1}`;
+          const newDeliveryId = `d-${generateUUID()}`;
           const newDelivery: Delivery = {
             id: newDeliveryId,
             orderId: order.id,
@@ -246,7 +255,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Adicionar Item ao Estoque
   const addInventoryItem = (itemData: Omit<InventoryItem, 'id' | 'status'>) => {
-    const newId = `i${inventory.length + 1}`;
+    const newId = `i-${generateUUID()}`;
     const newItem: InventoryItem = {
       ...itemData,
       id: newId,
@@ -293,7 +302,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addCustomer = (customerData: Omit<Customer, 'id'>) => {
     const newCustomer: Customer = {
       ...customerData,
-      id: `c${customers.length + 1}`
+      id: `c-${generateUUID()}`
     };
     setCustomers(prev => [...prev, newCustomer]);
 
