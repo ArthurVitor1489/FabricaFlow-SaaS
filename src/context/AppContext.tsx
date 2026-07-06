@@ -89,17 +89,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsLoading(true);
     try {
       if (isSupabaseConfigured && supabase) {
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Supabase login timeout')), 3000)
+        );
+
         // Mock login no Supabase para demonstração fácil (ou signup)
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const loginPromise = supabase.auth.signInWithPassword({
           email,
           password: 'Password123!', // Senha padrão demo
         });
+
+        const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
+
         if (error) {
           // Se não existir, tenta criar
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          const signUpPromise = supabase.auth.signUp({
             email,
             password: 'Password123!',
           });
+          const { data: signUpData, error: signUpError } = await Promise.race([signUpPromise, timeoutPromise]);
           if (signUpError) throw signUpError;
           setUser(signUpData.user);
         } else {
@@ -112,7 +120,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setRoleState(selectedRole);
       return true;
     } catch (err) {
-      console.error('Erro no login:', err);
+      console.warn('Erro ou timeout no login Supabase, aplicando fallback mock:', err);
       // Fallback para login mock mesmo com erro para não travar o usuário
       setUser({ id: 'mock-user-fallback', email, name: email.split('@')[0] });
       setRoleState(selectedRole);

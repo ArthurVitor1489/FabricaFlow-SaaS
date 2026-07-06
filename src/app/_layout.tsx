@@ -25,7 +25,7 @@ const AppLayoutContent = () => {
       if (role === 'operador') {
         router.replace('/(tabs)/kanban');
       } else {
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/index');
       }
     }
   }, [user, segments, role]);
