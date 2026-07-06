@@ -23,9 +23,9 @@ const AppLayoutContent = () => {
     } else if (user && inAuthGroup) {
       // Redireciona para o dashboard se logado e tentar acessar login
       if (role === 'operador') {
-        router.replace('/kanban');
+        router.replace('/(tabs)/kanban');
       } else {
-        router.replace('/');
+        router.replace('/(tabs)');
       }
     }
   }, [user, segments, role]);
