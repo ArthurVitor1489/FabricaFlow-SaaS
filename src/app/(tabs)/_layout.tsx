@@ -1,11 +1,13 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import * as Lucide from 'lucide-react-native';
 
 export default function TabsLayout() {
   const { role, setRole, logout } = useApp();
+  const insets = useSafeAreaInsets();
 
   const handleRoleToggle = () => {
     setRole(role === 'gerente' ? 'operador' : 'gerente');
@@ -72,8 +74,8 @@ export default function TabsLayout() {
           backgroundColor: '#0b0c10',
           borderTopWidth: 1,
           borderTopColor: '#292c35',
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
         },
         tabBarActiveTintColor: '#8b5cf6',
