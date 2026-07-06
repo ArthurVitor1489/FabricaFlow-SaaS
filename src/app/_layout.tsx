@@ -7,13 +7,13 @@ import '../styles/global.css';
 
 // Componente interno para gerenciar navegação baseada em Auth
 const AppLayoutContent = () => {
-  const { user } = useApp();
+  const { user, role } = useApp();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     // Evita erros se os segmentos ainda não estiverem prontos
-    if (segments.length === 0) return;
+    if ((segments.length as number) === 0) return;
 
     const inAuthGroup = segments[0] === 'auth';
 
@@ -22,9 +22,13 @@ const AppLayoutContent = () => {
       router.replace('/auth');
     } else if (user && inAuthGroup) {
       // Redireciona para o dashboard se logado e tentar acessar login
-      router.replace('/(tabs)');
+      if (role === 'operador') {
+        router.replace('/kanban');
+      } else {
+        router.replace('/');
+      }
     }
-  }, [user, segments]);
+  }, [user, segments, role]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
