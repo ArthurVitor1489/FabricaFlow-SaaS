@@ -67,7 +67,7 @@ export const StatCard: React.FC<StatCardProps> = ({
     <CardWrapper
       onPress={onPress}
       activeOpacity={0.8}
-      className={`p-4 rounded-2xl border ${scheme.bg} ${scheme.border} flex-row justify-between items-center mb-4`}
+      className={`p-4 rounded-2xl border ${scheme.bg} ${scheme.border} flex-row justify-between items-center mb-4 h-[138px]`}
       style={{
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
