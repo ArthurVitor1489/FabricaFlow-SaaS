@@ -161,67 +161,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const advanceOrder = (orderId: string) => {
     const stages: KanbanStage[] = ['backlog', 'prep', 'upholstery', 'assembly', 'ready'];
     
-    setOrders(prevOrders => {
-      return prevOrders.map(order => {
-        if (order.id !== orderId) return order;
+    // Encontrar o pedido atual
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
 
-        const currentIndex = stages.indexOf(order.stage);
-        if (currentIndex === -1 || currentIndex === stages.length - 1) return order; // Já está pronto
+    const currentIndex = stages.indexOf(order.stage);
+    if (currentIndex === -1 || currentIndex === stages.length - 1) return; // Já está pronto
 
-        const nextStage = stages[currentIndex + 1];
-        
-        // --- LOGICA DE CONSUMO INTELIGENTE DE ESTOQUE ---
-        const consumedItems = calculateStockConsumption(order.productType, order.quantity, nextStage);
-        if (consumedItems.length > 0) {
-          setInventory(prevInv => {
-            return prevInv.map(invItem => {
-              const spent = consumedItems.find(item => item.name === invItem.name);
-              if (!spent) return invItem;
-              
-              const newQty = Math.max(0, invItem.quantity - spent.quantity);
-              return {
-                ...invItem,
-                quantity: newQty,
-                status: newQty <= invItem.minQuantity ? 'critical' : 'normal'
-              };
-            });
-          });
-        }
-
-        // --- GERAÇÃO AUTOMÁTICA DE ENTREGA ---
-        if (nextStage === 'ready') {
-          const newDeliveryId = `d-${generateUUID()}`;
-          const newDelivery: Delivery = {
-            id: newDeliveryId,
-            orderId: order.id,
-            customerName: order.customerName,
-            productInfo: `${order.quantity}x ${order.modelName} (${order.fabricColor})`,
-            address: customers.find(c => c.id === order.customerId)?.address || 'Retirada na Fábrica',
-            status: 'pending',
-            driverName: 'Marcos Souza'
+    const nextStage = stages[currentIndex + 1];
+    const now = new Date().toISOString();
+    
+    // --- LOGICA DE CONSUMO INTELIGENTE DE ESTOQUE ---
+    const consumedItems = calculateStockConsumption(order.productType, order.quantity, nextStage);
+    if (consumedItems.length > 0) {
+      setInventory(prevInv => {
+        return prevInv.map(invItem => {
+          const spent = consumedItems.find(item => item.name === invItem.name);
+          if (!spent) return invItem;
+          
+          const newQty = Math.max(0, invItem.quantity - spent.quantity);
+          return {
+            ...invItem,
+            quantity: newQty,
+            status: newQty <= invItem.minQuantity ? 'critical' : 'normal'
           };
-          setDeliveries(prev => [...prev, newDelivery]);
-        }
+        });
+      });
+    }
 
-        const updatedOrder = {
-          ...order,
+    // --- GERAÇÃO AUTOMÁTICA DE ENTREGA ---
+    if (nextStage === 'ready') {
+      const newDeliveryId = `d-${generateUUID()}`;
+      const newDelivery: Delivery = {
+        id: newDeliveryId,
+        orderId: order.id,
+        customerName: order.customerName,
+        productInfo: `${order.quantity}x ${order.modelName} (${order.fabricColor})`,
+        address: customers.find(c => c.id === order.customerId)?.address || 'Retirada na Fábrica',
+        status: 'pending',
+        driverName: 'Marcos Souza'
+      };
+      setDeliveries(prev => [...prev, newDelivery]);
+    }
+
+    // --- ATUALIZAR PEDIDOS ---
+    setOrders(prevOrders => {
+      return prevOrders.map(o => {
+        if (o.id !== orderId) return o;
+        return {
+          ...o,
           stage: nextStage,
-          stageEntryTime: new Date().toISOString()
+          stageEntryTime: now
         };
-
-        // Opcional: Atualizar no Supabase Cloud
-        if (isSupabaseConfigured && supabase) {
-          supabase.from('orders')
-            .update({ stage: nextStage, stageEntryTime: updatedOrder.stageEntryTime })
-            .eq('id', orderId)
-            .then(({ error }) => {
-              if (error) console.error('Erro ao atualizar estágio no Supabase:', error);
-            });
-        }
-
-        return updatedOrder;
       });
     });
+
+    // Opcional: Atualizar no Supabase Cloud
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('orders')
+        .update({ stage: nextStage, stageEntryTime: now })
+        .eq('id', orderId)
+        .then(({ error }) => {
+          if (error) console.error('Erro ao atualizar estágio no Supabase:', error);
+        });
+    }
   };
 
   // Ajustar Estoque Manualmente
@@ -331,17 +334,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Simular Avanço de Tempo (+24h virtuais)
   const simulateTimeAdvance = () => {
     setVirtualDaysElapsed(prev => prev + 1);
-    
-    // Atualiza a data atual simulada de todos os pedidos ativos
-    setOrders(prevOrders => {
-      return prevOrders.map(order => {
-        const newSimulatedDate = new Date(order.simulatedDeliveryDate);
-        // Avançar o tempo virtual significa que a data de entrega simulada do pedido "se aproxima"
-        // Ou seja, na perspectiva do dashboard, a data atual do sistema avançou 1 dia,
-        // então a data de entrega simulada permanece igual, mas podemos diminuir os dias restantes do prazo.
-        return order;
-      });
-    });
   };
 
   return (

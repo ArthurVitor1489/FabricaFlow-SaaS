@@ -6,7 +6,7 @@ import * as Lucide from 'lucide-react-native';
 export default function InventoryScreen() {
   const { inventory, adjustInventoryItem, addInventoryItem, setInventoryQuantity } = useApp();
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState<'all' | 'wood' | 'fabric' | 'foam' | 'hardware'>('all');
+  const [activeCategory, setActiveCategory] = useState<'all' | 'wood' | 'fabric' | 'foam' | 'hardware' | 'accessory'>('all');
   
   // Estados do Modal de Cadastro
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +50,8 @@ export default function InventoryScreen() {
     { id: 'wood', label: 'Madeira' },
     { id: 'fabric', label: 'Tecido' },
     { id: 'foam', label: 'Espuma' },
-    { id: 'hardware', label: 'Ferragens' }
+    { id: 'hardware', label: 'Ferragens' },
+    { id: 'accessory', label: 'Acessórios' }
   ] as const;
 
   return (
